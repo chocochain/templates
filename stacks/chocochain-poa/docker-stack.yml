@@ -4,8 +4,6 @@ services:
         image: ${REGISTRY_URL}/ethstats
         environment:
             - WS_SECRET=123456
-        ports:
-            - 3000:3000
         networks:
             - chocochain-network
         deploy:
@@ -19,6 +17,8 @@ services:
             - SIGNER_COUNT=${SIGNER_COUNT}
         networks:
             - chocochain-network
+        volumes:
+            - config-volume:/configs
         entrypoint: /entrypoint.sh
         deploy:
             endpoint_mode: dnsrr
@@ -53,6 +53,8 @@ services:
             - EXTRA_FLAGS=${EXTRA_FLAGS} --ethstats {{.Task.Name}}:123456@ethstats:3000
         networks:
             - chocochain-network
+        volumes:
+            - /workspace/chocochain-data/{{.Service.Name}}/{{.Task.Name}}/:/chocochain
         entrypoint: /entrypoint.sh
         depends_on:
             - confignode
@@ -76,6 +78,8 @@ services:
             - EXTRA_FLAGS=${EXTRA_FLAGS} --ethstats {{.Task.Name}}:123456@ethstats:3000
         networks:
             - chocochain-network
+        volumes:
+            - /workspace/chocochain-data/{{.Service.Name}}/{{.Task.Name}}/:/chocochain
         entrypoint: /entrypoint.sh
         depends_on:
             - confignode
@@ -109,3 +113,7 @@ secrets:
 networks:
     chocochain-network:
         external: true
+
+volumes:
+    config-volume:
+    
