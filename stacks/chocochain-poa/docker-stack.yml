@@ -118,9 +118,9 @@ secrets:
 
 networks:
     chocochain-network:
-        external: true
+        driver: overlay
+        attachable: true
 
 volumes:
     config-volume:
     node-volume:
-    
