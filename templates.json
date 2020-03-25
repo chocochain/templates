@@ -64,6 +64,11 @@
         "name": "BLOCK_GASLIMIT",
         "label": "Maximum capacity of blocks",
         "default": "4700000"
+      },
+      {
+        "name": "Ethstats Port",
+        "label": "Port for Ethstats",
+        "default": "3000"
       }
     ]
   }
