@@ -1,0 +1,79 @@
+version: "3.7"
+services:
+    bootnode:
+        image: ${REGISTRY_URL}/chocochain-alltools
+        environment:
+            - SIGNER_COUNT=${SIGNER_COUNT}	
+        networks:
+            - chocochain-network
+        entrypoint: /entrypoint.sh
+        deploy:
+            endpoint_mode: dnsrr
+            replicas: 1
+            placement:
+              constraints: [node.role == manager]
+        configs:
+            - source: bootnode_script
+              target: /entrypoint.sh
+              mode: 0550
+
+    fullnode:
+        image: ${REGISTRY_URL}/chocochain
+        environment:
+            - EXTRA_FLAGS=
+        networks:
+            - chocochain-network
+        entrypoint: /entrypoint.sh
+        depends_on:
+            - bootnode
+        deploy:
+            endpoint_mode: dnsrr
+            replicas: ${SIGNER_COUNT}
+        configs:
+            - source: fullnode_script
+              target: /entrypoint.sh
+              mode: 0550
+            - source: preload_script
+              target: /scripts.js
+              mode: 0550
+        secrets:
+            - source: sealer_password
+              mode: 0400
+
+    backupnode:
+        image: ${REGISTRY_URL}/chocochain
+        environment:
+            - EXTRA_FLAGS=
+        networks:
+            - chocochain-network
+        entrypoint: /entrypoint.sh
+        depends_on:
+            - bootnode
+        deploy:
+            endpoint_mode: dnsrr
+            replicas: 0
+        configs:
+            - source: default_script
+              target: /entrypoint.sh
+              mode: 0550
+            - source: preload_script
+              target: /scripts.js
+              mode: 0550
+
+configs:
+    default_script:
+        external: true
+    fullnode_script:
+        external: true
+    preload_script:
+        external: true
+    bootnode_script:
+        external: true
+
+secrets:
+    sealer_password:
+        external: true
+
+networks:
+   chocochain-network:
+     external: true
