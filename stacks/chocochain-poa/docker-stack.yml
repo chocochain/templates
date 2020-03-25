@@ -50,11 +50,12 @@ services:
     fullnode:
         image: ${REGISTRY_URL}/chocochain
         environment:
+            - NODE_ID={{.Task.Name}}
             - EXTRA_FLAGS=${EXTRA_FLAGS} --ethstats {{.Task.Name}}:123456@ethstats:3000
         networks:
             - chocochain-network
         volumes:
-            - /workspace/chocochain-data/{{.Service.Name}}/{{.Task.Name}}/:/chocochain
+            - node-volume:/chocochain-{{.Task.Name}}
         entrypoint: /entrypoint.sh
         depends_on:
             - confignode
@@ -75,11 +76,12 @@ services:
     backupnode:
         image: ${REGISTRY_URL}/chocochain
         environment:
+            - NODE_ID={{.Task.Name}}
             - EXTRA_FLAGS=${EXTRA_FLAGS} --ethstats {{.Task.Name}}:123456@ethstats:3000
         networks:
             - chocochain-network
         volumes:
-            - /workspace/chocochain-data/{{.Service.Name}}/{{.Task.Name}}/:/chocochain
+            - node-volume:/chocochain-{{.Task.Name}}
         entrypoint: /entrypoint.sh
         depends_on:
             - confignode
@@ -116,4 +118,5 @@ networks:
 
 volumes:
     config-volume:
+    node-volume:
     
