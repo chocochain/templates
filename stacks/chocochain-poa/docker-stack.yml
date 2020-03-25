@@ -1,9 +1,22 @@
 version: "3.7"
 services:
-    bootnode:
+    ethstats:
+        image: ${REGISTRY_URL}/ethstats
+        environment:
+            - WS_SECRET=123456
+        ports:
+            - 3000:3000
+        networks:
+            - chocochain-network
+        deploy:
+            replicas: 1
+            placement:
+                constraints: [node.role == manager]
+    
+    confignode:
         image: ${REGISTRY_URL}/chocochain-alltools
         environment:
-            - SIGNER_COUNT=${SIGNER_COUNT}	
+            - SIGNER_COUNT=${SIGNER_COUNT}
         networks:
             - chocochain-network
         entrypoint: /entrypoint.sh
@@ -11,7 +24,24 @@ services:
             endpoint_mode: dnsrr
             replicas: 1
             placement:
-              constraints: [node.role == manager]
+                constraints: [node.role == manager]
+        configs:
+            - source: confignode_script
+              target: /entrypoint.sh
+              mode: 0550
+
+    bootnode:
+        image: ${REGISTRY_URL}/chocochain-alltools
+        networks:
+            - chocochain-network
+        entrypoint: /entrypoint.sh
+        depends_on:
+            - confignode
+        deploy:
+            endpoint_mode: dnsrr
+            replicas: 1
+            placement:
+                constraints: [node.role == manager]
         configs:
             - source: bootnode_script
               target: /entrypoint.sh
@@ -20,12 +50,12 @@ services:
     fullnode:
         image: ${REGISTRY_URL}/chocochain
         environment:
-            - EXTRA_FLAGS=
+            - EXTRA_FLAGS=${EXTRA_FLAGS} --ethstats {{.Task.Name}}:123456@ethstats:3000
         networks:
             - chocochain-network
         entrypoint: /entrypoint.sh
         depends_on:
-            - bootnode
+            - confignode
         deploy:
             endpoint_mode: dnsrr
             replicas: ${SIGNER_COUNT}
@@ -43,12 +73,12 @@ services:
     backupnode:
         image: ${REGISTRY_URL}/chocochain
         environment:
-            - EXTRA_FLAGS=
+            - EXTRA_FLAGS=${EXTRA_FLAGS} --ethstats {{.Task.Name}}:123456@ethstats:3000
         networks:
             - chocochain-network
         entrypoint: /entrypoint.sh
         depends_on:
-            - bootnode
+            - confignode
         deploy:
             endpoint_mode: dnsrr
             replicas: 0
@@ -69,11 +99,13 @@ configs:
         external: true
     bootnode_script:
         external: true
+    confignode_script:
+        external: true
 
 secrets:
     sealer_password:
         external: true
 
 networks:
-   chocochain-network:
-     external: true
+    chocochain-network:
+        external: true
