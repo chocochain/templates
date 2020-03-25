@@ -4,7 +4,8 @@ services:
         image: ${REGISTRY_URL}/ethstats
         environment:
             - WS_SECRET=123456
-            - PORT=${ETHSTATS_PORT}
+        ports:
+            - ${ETHSTATS_PORT}:3000
         networks:
             - chocochain-network
         deploy:
