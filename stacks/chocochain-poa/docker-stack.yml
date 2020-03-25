@@ -59,7 +59,7 @@ services:
         networks:
             - chocochain-network
         volumes:
-            - node-volume:/chocochain-{{.Task.Name}}
+            - node-volume:/chocochain
         entrypoint: /entrypoint.sh
         depends_on:
             - confignode
@@ -85,7 +85,7 @@ services:
         networks:
             - chocochain-network
         volumes:
-            - node-volume:/chocochain-{{.Task.Name}}
+            - node-volume:/chocochain
         entrypoint: /entrypoint.sh
         depends_on:
             - confignode
@@ -124,3 +124,4 @@ networks:
 volumes:
     config-volume:
     node-volume:
+    
