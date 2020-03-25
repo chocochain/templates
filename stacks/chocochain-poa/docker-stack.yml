@@ -4,6 +4,7 @@ services:
         image: ${REGISTRY_URL}/ethstats
         environment:
             - WS_SECRET=123456
+            - PORT=${ETHSTATS_PORT}
         networks:
             - chocochain-network
         deploy:
@@ -15,6 +16,8 @@ services:
         image: ${REGISTRY_URL}/chocochain-alltools
         environment:
             - SIGNER_COUNT=${SIGNER_COUNT}
+            - BLOCK_INTERVAL=${BLOCK_INTERVAL}
+            - BLOCK_GASLIMIT=${BLOCK_GASLIMIT}
         networks:
             - chocochain-network
         volumes:
