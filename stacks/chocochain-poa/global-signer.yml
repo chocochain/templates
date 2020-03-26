@@ -39,8 +39,6 @@ services:
         networks:
             - chocochain-network
         entrypoint: /entrypoint.sh
-        depends_on:
-            - confignode
         deploy:
             endpoint_mode: dnsrr
             replicas: 1
@@ -61,8 +59,6 @@ services:
         volumes:
             - node-volume:/chocochain
         entrypoint: /entrypoint.sh
-        depends_on:
-            - confignode
         deploy:
             mode: global
             endpoint_mode: vip
@@ -87,10 +83,8 @@ services:
         volumes:
             - node-volume:/chocochain
         entrypoint: /entrypoint.sh
-        depends_on:
-            - confignode
         deploy:
-            endpoint_mode: dnsrr
+            endpoint_mode: vip
             replicas: 0
         configs:
             - source: default_script
