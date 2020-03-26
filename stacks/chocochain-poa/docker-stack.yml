@@ -9,6 +9,7 @@ services:
         networks:
             - chocochain-network
         deploy:
+            endpoint_mode: dnsrr
             replicas: 1
             placement:
                 constraints: [node.role == manager]
@@ -54,8 +55,8 @@ services:
     fullnode:
         image: ${REGISTRY_URL}/chocochain
         environment:
-            - NODE_ID={{.Task.Name}}
-            - EXTRA_FLAGS=${EXTRA_FLAGS} --ethstats {{.Task.Name}}:123456@ethstats:3000
+            - NODE_ID={{.Service.Name}}-{{.Task.Slot}}
+            - EXTRA_FLAGS=${EXTRA_FLAGS} --ethstats {{.Service.Name}}-{{.Task.Slot}}:123456@ethstats:3000
         networks:
             - chocochain-network
         volumes:
@@ -64,7 +65,7 @@ services:
         depends_on:
             - confignode
         deploy:
-            endpoint_mode: dnsrr
+            endpoint_mode: vip
             replicas: ${SIGNER_COUNT}
         configs:
             - source: fullnode_script
@@ -80,8 +81,8 @@ services:
     backupnode:
         image: ${REGISTRY_URL}/chocochain
         environment:
-            - NODE_ID={{.Task.Name}}
-            - EXTRA_FLAGS=${EXTRA_FLAGS} --ethstats {{.Task.Name}}:123456@ethstats:3000
+            - NODE_ID={{.Service.Name}}-{{.Task.Slot}}
+            - EXTRA_FLAGS=${EXTRA_FLAGS} --ethstats {{.Service.Name}}-{{.Task.Slot}}:123456@ethstats:3000
         networks:
             - chocochain-network
         volumes:
