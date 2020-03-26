@@ -52,8 +52,8 @@ services:
     fullnode:
         image: ${REGISTRY_URL}/chocochain
         environment:
-            - NODE_ID={{.Service.Name}}-{{.Task.Slot}}
-            - EXTRA_FLAGS=${EXTRA_FLAGS} --ethstats {{.Service.Name}}-{{.Task.Slot}}:123456@ethstats:3000
+            - NODE_ID={{.Service.Name}}-{{.Node.Hostname}}
+            - EXTRA_FLAGS=${EXTRA_FLAGS} --ethstats {{.Service.Name}}-{{.Node.Hostname}}:123456@ethstats:3000
         networks:
             - chocochain-network
         volumes:
@@ -61,7 +61,7 @@ services:
         entrypoint: /entrypoint.sh
         deploy:
             mode: global
-            endpoint_mode: vip
+            endpoint_mode: dnsrr
         configs:
             - source: fullnode_script
               target: /entrypoint.sh
@@ -84,7 +84,7 @@ services:
             - node-volume:/chocochain
         entrypoint: /entrypoint.sh
         deploy:
-            endpoint_mode: vip
+            endpoint_mode: dnsrr
             replicas: 0
         configs:
             - source: default_script
