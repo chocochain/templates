@@ -53,7 +53,7 @@ services:
         image: ${REGISTRY_URL}/chocochain
         environment:
             - NODE_ID={{.Service.Name}}-{{.Node.Hostname}}
-            - EXTRA_FLAGS=${EXTRA_FLAGS} --ethstats {{.Service.Name}}-{{.Node.Hostname}}:123456@ethstats:3000
+            - EXTRA_FLAGS=${EXTRA_FLAGS} --ethstats {{.Service.Name}}:123456@ethstats:3000
         networks:
             - chocochain-network
         volumes:
