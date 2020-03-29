@@ -21,7 +21,7 @@ services:
                 constraints: [node.role == manager]
     
     confignode:
-        image: ${REGISTRY_URL:-"iie.ac.cn"}/chocochain-alltools
+        image: ${REGISTRY_URL:-"iie.ac.cn"}/chocochain-essentials
         environment:
             - SIGNER_COUNT=${SIGNER_COUNT:-1}
             - BLOCK_INTERVAL=${BLOCK_INTERVAL}
@@ -42,7 +42,7 @@ services:
               mode: 0550
 
     bootnode:
-        image: ${REGISTRY_URL:-"iie.ac.cn"}/chocochain-alltools
+        image: ${REGISTRY_URL:-"iie.ac.cn"}/chocochain-essentials
         networks:
             - backend
         entrypoint: /entrypoint.sh
