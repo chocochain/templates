@@ -1,14 +1,14 @@
 version: "3.7"
 services:
     extractor:
-        image: ${REGISTRY_URL:-"iie.ac.cn"}/chocochain-essentials
+        image: ${REGISTRY_URL:-iie.ac.cn}/chocochain-essentials
         entrypoint: ["extractor", "-dbconn", "host=postgres user=chocochain password=123456 dbname=dashboard sslmode=disable", "-gethaddr=ws://fullnode:8546", "-maxopenconn=10", "-maxidelconn=5"]
         networks:
             - backend
             - dashboard_backend
 
     ethstats:
-        image: ${REGISTRY_URL:-"iie.ac.cn"}/ethstats
+        image: ${REGISTRY_URL:-iie.ac.cn}/ethstats
         environment:
             - WS_SECRET=123456
         ports:
@@ -21,7 +21,7 @@ services:
                 constraints: [node.role == manager]
     
     confignode:
-        image: ${REGISTRY_URL:-"iie.ac.cn"}/chocochain-essentials
+        image: ${REGISTRY_URL:-iie.ac.cn}/chocochain-essentials
         environment:
             - SIGNER_COUNT=${SIGNER_COUNT:-1}
             - BLOCK_INTERVAL=${BLOCK_INTERVAL}
@@ -42,7 +42,7 @@ services:
               mode: 0550
 
     bootnode:
-        image: ${REGISTRY_URL:-"iie.ac.cn"}/chocochain-essentials
+        image: ${REGISTRY_URL:-iie.ac.cn}/chocochain-essentials
         networks:
             - backend
         entrypoint: /entrypoint.sh
@@ -59,7 +59,7 @@ services:
               mode: 0550
 
     fullnode:
-        image: ${REGISTRY_URL:-"iie.ac.cn"}/chocochain
+        image: ${REGISTRY_URL:-iie.ac.cn}/chocochain
         environment:
             - NODE_ID={{.Service.Name}}
             - EXTRA_FLAGS=${EXTRA_FLAGS} --ethstats {{.Service.Name}}-{{.Node.Hostname}}:123456@ethstats:3000
@@ -71,8 +71,8 @@ services:
         depends_on:
             - confignode
         deploy:
+            mode: global
             endpoint_mode: vip
-            replicas: ${SIGNER_COUNT:-1}
         configs:
             - source: fullnode_script
               target: /entrypoint.sh
@@ -85,7 +85,7 @@ services:
               mode: 0400
 
     backupnode:
-        image: ${REGISTRY_URL:-"iie.ac.cn"}/chocochain
+        image: ${REGISTRY_URL:-iie.ac.cn}/chocochain
         environment:
             - NODE_ID={{.Service.Name}}-{{.Task.Slot}}
             - EXTRA_FLAGS=${EXTRA_FLAGS} --ethstats {{.Service.Name}}-{{.Task.Slot}}:123456@ethstats:3000
@@ -110,24 +110,24 @@ services:
 configs:
     default_script:
         external: true
-        name: ${DEFAULT_SCRIPT:-"default_script"}
+        name: ${DEFAULT_SCRIPT:-default_script}
     fullnode_script:
         external: true
-        name: ${FULLNODE_SCRIPT:-"fullnode_script"}
+        name: ${FULLNODE_SCRIPT:-fullnode_script}
     preload_script:
         external: true
-        name: ${PRELOAD_SCRIPT:-"preload_script"}
+        name: ${PRELOAD_SCRIPT:-preload_script}
     bootnode_script:
         external: true
-        name: ${BOOTNODE_SCRIPT:-"bootnode_script"}
+        name: ${BOOTNODE_SCRIPT:-bootnode_script}
     confignode_script:
         external: true
-        name: ${CONFIGNODE_SCRIPT:-"confignode_script"}
+        name: ${CONFIGNODE_SCRIPT:-confignode_script}
 
 secrets:
     sealer_password:
         external: true
-        name: ${SEALER_PASSWORD:-"sealer_password"}
+        name: ${SEALER_PASSWORD:-sealer_password}
 
 networks:
     backend:
