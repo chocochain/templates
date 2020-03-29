@@ -1,26 +1,33 @@
 version: "3.7"
 services:
+    extractor:
+        image: ${REGISTRY_URL:-"iie.ac.cn"}/chocochain-essentials
+        entrypoint: ["extractor", "-dbconn", "host=postgres user=chocochain password=123456 dbname=dashboard sslmode=disable", "-gethaddr=ws://fullnode:8546", "-maxopenconn=10", "-maxidelconn=5"]
+        networks:
+            - backend
+            - dashboard_backend
+
     ethstats:
-        image: ${REGISTRY_URL}/ethstats
+        image: ${REGISTRY_URL:-"iie.ac.cn"}/ethstats
         environment:
             - WS_SECRET=123456
         ports:
-            - ${ETHSTATS_PORT}:3000
+            - ${ETHSTATS_PORT:-3000}:3000
         networks:
-            - chocochain-network
+            - backend
         deploy:
             replicas: 1
             placement:
                 constraints: [node.role == manager]
     
     confignode:
-        image: ${REGISTRY_URL}/chocochain-alltools
+        image: ${REGISTRY_URL:-"iie.ac.cn"}/chocochain-alltools
         environment:
-            - SIGNER_COUNT=${SIGNER_COUNT}
+            - SIGNER_COUNT=${SIGNER_COUNT:-1}
             - BLOCK_INTERVAL=${BLOCK_INTERVAL}
             - BLOCK_GASLIMIT=${BLOCK_GASLIMIT}
         networks:
-            - chocochain-network
+            - backend
         volumes:
             - config-volume:/configs
         entrypoint: /entrypoint.sh
@@ -35,10 +42,12 @@ services:
               mode: 0550
 
     bootnode:
-        image: ${REGISTRY_URL}/chocochain-alltools
+        image: ${REGISTRY_URL:-"iie.ac.cn"}/chocochain-alltools
         networks:
-            - chocochain-network
+            - backend
         entrypoint: /entrypoint.sh
+        depends_on:
+            - confignode
         deploy:
             endpoint_mode: dnsrr
             replicas: 1
@@ -50,18 +59,20 @@ services:
               mode: 0550
 
     fullnode:
-        image: ${REGISTRY_URL}/chocochain
+        image: ${REGISTRY_URL:-"iie.ac.cn"}/chocochain
         environment:
             - NODE_ID={{.Service.Name}}
             - EXTRA_FLAGS=${EXTRA_FLAGS} --ethstats {{.Service.Name}}-{{.Node.Hostname}}:123456@ethstats:3000
         networks:
-            - chocochain-network
+            - backend
         volumes:
             - node-volume:/chocochain
         entrypoint: /entrypoint.sh
+        depends_on:
+            - confignode
         deploy:
-            mode: global
-            endpoint_mode: dnsrr
+            endpoint_mode: vip
+            replicas: ${SIGNER_COUNT:-1}
         configs:
             - source: fullnode_script
               target: /entrypoint.sh
@@ -74,17 +85,19 @@ services:
               mode: 0400
 
     backupnode:
-        image: ${REGISTRY_URL}/chocochain
+        image: ${REGISTRY_URL:-"iie.ac.cn"}/chocochain
         environment:
             - NODE_ID={{.Service.Name}}-{{.Task.Slot}}
             - EXTRA_FLAGS=${EXTRA_FLAGS} --ethstats {{.Service.Name}}-{{.Task.Slot}}:123456@ethstats:3000
         networks:
-            - chocochain-network
+            - backend
         volumes:
             - node-volume:/chocochain
         entrypoint: /entrypoint.sh
+        depends_on:
+            - confignode
         deploy:
-            endpoint_mode: dnsrr
+            endpoint_mode: vip
             replicas: 0
         configs:
             - source: default_script
@@ -96,24 +109,32 @@ services:
 
 configs:
     default_script:
-        external: true
+        external:
+            name: ${DEFAULT_SCRIPT:-"default_script"}
     fullnode_script:
-        external: true
+        external:
+            name: ${FULLNODE_SCRIPT:-"fullnode_script"}
     preload_script:
-        external: true
+        external:
+            name: ${PRELOAD_SCRIPT:-"preload_script"}
     bootnode_script:
-        external: true
+        external:
+            name: ${BOOTNODE_SCRIPT:-"bootnode_script"}
     confignode_script:
-        external: true
+        external:
+            name: ${CONFIGNODE_SCRIPT:-"confignode_script"}
 
 secrets:
     sealer_password:
-        external: true
+        external:
+            name: ${SEALER_PASSWORD:-"sealer_password"}
 
 networks:
-    chocochain-network:
+    backend:
         driver: overlay
         attachable: true
+    dashboard_backend:
+        external: true
 
 volumes:
     config-volume:
