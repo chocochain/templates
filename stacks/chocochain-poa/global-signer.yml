@@ -140,6 +140,8 @@ networks:
         attachable: true
     dashboard_backend:
         external: true
+    tick_backend:
+        external: true
 
 volumes:
     config-volume:
