@@ -6,7 +6,7 @@ services:
         deploy:
             restart_policy:
                 condition: on-failure
-                delay: 10s
+                delay: 20s
         networks:
             - backend
             - dashboard_backend
