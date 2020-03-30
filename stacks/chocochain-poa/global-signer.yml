@@ -3,6 +3,10 @@ services:
     extractor:
         image: ${REGISTRY_URL:-iie.ac.cn}/chocochain-essentials
         entrypoint: ["extractor", "-dbconn", "host=postgres user=chocochain password=123456 dbname=dashboard sslmode=disable", "-gethaddr=ws://fullnode:8546", "-maxopenconn=10", "-maxidelconn=5"]
+        deploy:
+            restart_policy:
+                condition: on-failure
+                delay: 10s
         networks:
             - backend
             - dashboard_backend
@@ -66,6 +70,7 @@ services:
             - EXTRA_FLAGS=${FULLNODE_FLAGS} --ethstats {{.Service.Name}}-{{.Node.Hostname}}:123456@ethstats:3000
         networks:
             - backend
+            - tick_backend
         volumes:
             - node-volume:/chocochain
         entrypoint: /entrypoint.sh
@@ -93,6 +98,7 @@ services:
             - EXTRA_FLAGS=${NORMALNODE_FLAGS} --ethstats {{.Service.Name}}-{{.Task.Slot}}:123456@ethstats:3000
         networks:
             - backend
+            - tick_backend
         volumes:
             - node-volume:/chocochain
         entrypoint: /entrypoint.sh
