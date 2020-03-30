@@ -23,7 +23,6 @@ services:
     confignode:
         image: ${REGISTRY_URL:-iie.ac.cn}/chocochain-essentials
         environment:
-            - NETWORK_ID=${NETWORK_ID}
             - SIGNER_COUNT=${SIGNER_COUNT:-1}
             - BLOCK_INTERVAL=${BLOCK_INTERVAL}
             - BLOCK_GASLIMIT=${BLOCK_GASLIMIT}
@@ -63,7 +62,8 @@ services:
         image: ${REGISTRY_URL:-iie.ac.cn}/chocochain
         environment:
             - NODE_ID={{.Service.Name}}
-            - EXTRA_FLAGS=${EXTRA_FLAGS} --ethstats {{.Service.Name}}-{{.Node.Hostname}}:123456@ethstats:3000
+            - BLOCK_GASLIMIT=${BLOCK_GASLIMIT}
+            - EXTRA_FLAGS=${FULLNODE_FLAGS} --ethstats {{.Service.Name}}-{{.Node.Hostname}}:123456@ethstats:3000
         networks:
             - backend
         volumes:
@@ -85,11 +85,12 @@ services:
             - source: sealer_password
               mode: 0400
 
-    backupnode:
+    normalnode:
         image: ${REGISTRY_URL:-iie.ac.cn}/chocochain
         environment:
             - NODE_ID={{.Service.Name}}-{{.Task.Slot}}
-            - EXTRA_FLAGS=${EXTRA_FLAGS} --ethstats {{.Service.Name}}-{{.Task.Slot}}:123456@ethstats:3000
+            - BLOCK_GASLIMIT=${BLOCK_GASLIMIT}
+            - EXTRA_FLAGS=${NORMALNODE_FLAGS} --ethstats {{.Service.Name}}-{{.Task.Slot}}:123456@ethstats:3000
         networks:
             - backend
         volumes:
