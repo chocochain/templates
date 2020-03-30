@@ -27,11 +27,11 @@ services:
     confignode:
         image: ${REGISTRY_URL:-iie.ac.cn}/chocochain-essentials
         environment:
-            - CONSENSUS_ALGORITHM=${CONSENSUS_ALGORITHM:-POA}
             - SIGNER_COUNT=${SIGNER_COUNT:-1}
             - BLOCK_INTERVAL=${BLOCK_INTERVAL}
             - BLOCK_GASLIMIT=${BLOCK_GASLIMIT}
             - NETWORK_ID=${NETWORK_ID}
+            - CONSENSUS_ALGORITHM=${CONSENSUS_ALGORITHM}
         networks:
             - backend
         volumes:
