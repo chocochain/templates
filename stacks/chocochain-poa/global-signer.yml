@@ -108,6 +108,9 @@ services:
             - source: preload_script
               target: /scripts.js
               mode: 0550
+        secrets:
+            - source: sealer_password
+              mode: 0400
 
 configs:
     default_script:
