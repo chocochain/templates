@@ -15,8 +15,6 @@ services:
         image: ${REGISTRY_URL:-iie.ac.cn}/ethstats
         environment:
             - WS_SECRET=123456
-        ports:
-            - ${ETHSTATS_PORT:-3000}:3000
         networks:
             - backend
         deploy:
