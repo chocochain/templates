@@ -9,7 +9,7 @@ services:
                 delay: 20s
         networks:
             - backend
-            - dashboard_backend
+            - dashboard_backend2
 
     ethstats:
         image: ${REGISTRY_URL:-iie.ac.cn}/ethstats
@@ -146,7 +146,7 @@ networks:
     backend:
         driver: overlay
         attachable: true
-    dashboard_backend:
+    dashboard_backend2:
         external: true
     tick_backend2:
         external: true
