@@ -71,7 +71,7 @@ services:
             - NETWORK_ID=${NETWORK_ID}
         networks:
             - backend
-            - tick_backend
+            - tick_backend2
         volumes:
             - node-volume:/chocochain
         entrypoint: /entrypoint.sh
@@ -100,7 +100,7 @@ services:
             - NETWORK_ID=${NETWORK_ID}
         networks:
             - backend
-            - tick_backend
+            - tick_backend2
         volumes:
             - node-volume:/chocochain
         entrypoint: /entrypoint.sh
@@ -148,7 +148,7 @@ networks:
         attachable: true
     dashboard_backend:
         external: true
-    tick_backend:
+    tick_backend2:
         external: true
 
 volumes:
